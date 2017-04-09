@@ -63,10 +63,21 @@ func get_random_values(level string) (float32, float32){
     return r1, r2
 }
 
-func get_random_operator() (string){
+func get_random_operator(level string) (string){
     seed := rand.NewSource(time.Now().UnixNano())
     randgen := rand.New(seed)
-    op := "+-/*"[randgen.Intn(4)]
+    var operatorSet string
+    switch level {
+    case "Easy":
+        operatorSet = "+-"
+    case "Normal":
+        operatorSet = "+-*"
+    case "Hard":
+        operatorSet = "+-*/"
+    default:
+        operatorSet = "+"
+    }
+    op := operatorSet[randgen.Intn(len(operatorSet))]
     return string(op)
 }
 
@@ -125,7 +136,7 @@ func main() {
 
         // TODO: Making more sensible operations
         // e.g. rounding when using "/"
-        op = get_random_operator()
+        op = get_random_operator(config.Level)
         expected = evaluate_expression(op, r1, r2)
 
         fmt.Printf("%g %s %g = ", r1, op, r2)
