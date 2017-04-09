@@ -15,6 +15,11 @@ type Config struct {
     Num     int
 }
 
+type operation struct {
+    name string
+    fname func(args []float32) (float32)
+}
+
 func save_result(score int, config Config) (){
     path := "./results/"+config.User
 
@@ -63,46 +68,43 @@ func get_random_values(level string) (float32, float32){
     return r1, r2
 }
 
-func get_random_operator(level string) (string){
+func get_function() (operation) {
     seed := rand.NewSource(time.Now().UnixNano())
     randgen := rand.New(seed)
-    var operatorSet string
-    switch level {
-    case "Easy":
-        operatorSet = "+-"
-    case "Normal":
-        operatorSet = "+-*"
-    case "Hard":
-        operatorSet = "+-*/"
-    default:
-        operatorSet = "+"
-    }
-    op := operatorSet[randgen.Intn(len(operatorSet))]
-    return string(op)
+
+    flist := []operation {
+                 operation{"+", add},
+		             operation{"-", substract},
+		             operation{"*", multiply},
+		             operation{"/", divide}}
+
+    f_index := randgen.Intn(len(flist))
+    return flist[f_index]
 }
 
-func evaluate_expression(op string, r1 float32, r2 float32) (float32) {
-    switch op {
-    case "+":
-        return r1 + r2
-    case "-":
-        return r1 - r2
-    case "*":
-        return r1 * r2
-    case "/":
-        return r1 / zeroDivide(r2)
-    default:
-        panic("UNSUPPORTED OPERATION")
-    }
+func add(args []float32) (float32) {
+    return args[0] + args[1]
+}
+
+func substract(args []float32) (float32) {
+    return args[0] - args[1]
+}
+
+func multiply(args []float32) (float32) {
+    return args[0] * args[1]
+}
+
+func divide(args []float32) (float32) {
+    return args[0] / zeroDivide(args[1])
 }
 
 func zeroDivide(r2 float32) (float32) {
     seed := rand.NewSource(time.Now().UnixNano())
     randgen := rand.New(seed)
-    if r2 != 0 {
-        return r2
+    for r2 == 0 {
+        r2 = float32(randgen.Intn(200)-100)/8
     }
-    return zeroDivide(float32(randgen.Intn(200)-100)/8)
+    return r2
 }
 
 func main() {
@@ -119,7 +121,7 @@ func main() {
     fmt.Printf("Selected difficulty: %s\n", config.Level)
 
     var r1, r2 float32
-    var op string
+    var op operation
 
     // Variables
     var answer, expected float32
@@ -136,10 +138,10 @@ func main() {
 
         // TODO: Making more sensible operations
         // e.g. rounding when using "/"
-        op = get_random_operator(config.Level)
-        expected = evaluate_expression(op, r1, r2)
+        op = get_function()
+        expected = op.fname([]float32{r1, r2})
 
-        fmt.Printf("%g %s %g = ", r1, op, r2)
+        fmt.Printf("%g %s %g = ", r1, op.name, r2)
         _, err := fmt.Scanf("%g", &answer)
         if err != nil {
             fmt.Println("Cannot read answer:", err)
