@@ -8,6 +8,7 @@ import (
     "time"
 )
 
+////////////////////////////////////////
 type Config struct {
     User    string
     Level   string
@@ -19,20 +20,21 @@ type operation struct {
     Func func(args []float32) (float32)
 }
 
+////////////////////////////////////////
 func saveResult(score int, config Config) (){
     path := "./results/"+config.User
+    var f *os.File
+    var err error
 
-    // If no score for given user
-    if _, err := os.Stat(path); os.IsNotExist(err) {
+    // Creates or loads score file
+    if _, err = os.Stat(path); os.IsNotExist(err) {
         fmt.Println("Creating score file for user", config.User)
-        f, err := os.Create(path)
-        if err != nil {
-            panic(err)
-        }
-        f.Close()
+        f, err = os.Create(path)
+    } else {
+        f, err = os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0600)
     }
-    // File exists, just open it
-    f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0600)
+
+    // Handle error in both cases
     if err != nil {
         panic(err)
     }
@@ -42,11 +44,14 @@ func saveResult(score int, config Config) (){
     dataStr := time.Now().Format("2006-01-02 15:04:05")
     level := config.Level[0:1]
     text := fmt.Sprintf("%s %d %s\n", dataStr, score, level)
-    if _, err = f.WriteString(text); err != nil {
+
+    if _, err := f.WriteString(text); err != nil {
         panic(err)
     }
 }
 
+////////////////////////////////////////
+// Random select
 func getRandom(randRange [3]float32) (float32) {
     step := randRange[2]
     min := int(randRange[0]/step)
@@ -91,6 +96,8 @@ func getFunction() (operation) {
     return flist[f_index]
 }
 
+////////////////////////////////////////
+// Maths operators/functions
 func add(args []float32) (float32) {
     return args[0] + args[1]
 }
@@ -114,6 +121,8 @@ func zeroDivide(r2 float32) (float32) {
     return r2
 }
 
+////////////////////////////////////////
+// Magic starts here
 func main() {
     file, _ := os.Open("config.json")
     decoder := json.NewDecoder(file)
