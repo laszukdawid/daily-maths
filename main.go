@@ -19,7 +19,7 @@ type operation struct {
     Func func(args []float32) (float32)
 }
 
-func save_result(score int, config Config) (){
+func saveResult(score int, config Config) (){
     path := "./results/"+config.User
 
     // If no score for given user
@@ -39,47 +39,47 @@ func save_result(score int, config Config) (){
 
     defer f.Close()
 
-    data_str := time.Now().Format("2006-01-02 15:04:05")
+    dataStr := time.Now().Format("2006-01-02 15:04:05")
     level := config.Level[0:1]
-    text := fmt.Sprintf("%s %d %s\n", data_str, score, level)
+    text := fmt.Sprintf("%s %d %s\n", dataStr, score, level)
     if _, err = f.WriteString(text); err != nil {
         panic(err)
     }
 }
 
-func get_random(rand_range [3]float32) (float32) {
-    step := rand_range[2]
-    min := int(rand_range[0]/step)
-    max := int(rand_range[1]/step)
+func getRandom(randRange [3]float32) (float32) {
+    step := randRange[2]
+    min := int(randRange[0]/step)
+    max := int(randRange[1]/step)
     return step*float32(rand.Intn(max)+min)
 }
 
-func get_random_values(level string) ([]float32){
+func getRandomValues(level string) ([]float32){
     var r []float32
-    var rang_range [3]float32
+    var rangRange [3]float32
     var n int
     switch level {
     case "Easy":
         n = 2
-        rang_range = [3]float32{0, 20, 1}
+        rangRange = [3]float32{0, 20, 1}
     case "Normal":
         n = 2
-        rang_range = [3]float32{-20, 20, 0.5}
+        rangRange = [3]float32{-20, 20, 0.5}
     case "Hard":
         n = 2
-        rang_range = [3]float32{-50, 50, 0.5}
+        rangRange = [3]float32{-50, 50, 0.5}
     default:
         panic("DEFINE YOURSELF!")
     }
 
     for len(r) < n {
-        r = append(r, get_random(rang_range))
+        r = append(r, getRandom(rangRange))
     }
 
     return r
 }
 
-func get_function() (operation) {
+func getFunction() (operation) {
 
     flist := []operation {
                  operation{"+", add},
@@ -135,18 +135,18 @@ func main() {
     var op operation
     var answer, expected float32
     score := 0
-    good_responses := []string{"Awesome.", "Obviously.", "Yep.",
+    goodResponses := []string{"Awesome.", "Obviously.", "Yep.",
         "10 points for "+config.User+"dor.",
         "Whoever thinks otherwise is stupid."}
 
     for i:=0; i<config.Num; i++ {
         fmt.Printf("%d. ", i)
 
-        r = get_random_values(config.Level)
+        r = getRandomValues(config.Level)
 
         // TODO: Making more sensible operations
         // e.g. rounding when using "/"
-        op = get_function()
+        op = getFunction()
         expected = op.Func(r)
 
         fmt.Printf("%g %s %g = ", r[0], op.name, r[1])
@@ -156,8 +156,8 @@ func main() {
         }
 
         if answer==expected {
-            response_idx := rand.Intn(len(good_responses))
-            fmt.Println(good_responses[response_idx])
+            responseIdx := rand.Intn(len(goodResponses))
+            fmt.Println(goodResponses[responseIdx])
             score += 1
         } else {
             fmt.Println("Nope. Excpected:", expected)
@@ -166,6 +166,6 @@ func main() {
     fmt.Printf("Final score: %d/%d\n", score, config.Num)
 
     // Saving
-    save_result(score, config)
+    saveResult(score, config)
 
 }
