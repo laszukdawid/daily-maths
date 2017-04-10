@@ -8,8 +8,8 @@ go build
 ```
 
 # How to use it?
-I'm not sure as well. For now there are 3 difficulty levels (Easy, Medium & Hard) which should be set in the config file.
-Everything currently is for `+` (plus) operation and the difference between difficulty levels is in the rage of numbers. 
+Gently. Push it hard and you might awake the power of maths awesomeness! After setting difficulty level in `config.json` asked a series of exercises. Don't worry, we are cool; we praise good answers and keep any mistake is quickly forgotten. At the end you'll be given some score. Make sure your parent(s), sibling(s), partner(s) and everyone knows. Their jealousy is guaranteed.
+
 
 # Is this finished?
 Hahaha... no.

@@ -5,7 +5,6 @@ import (
     "fmt"
     "os"
     "math/rand"
-    //"strconv"
     "time"
 )
 
@@ -17,7 +16,7 @@ type Config struct {
 
 type operation struct {
     name string
-    fname func(args []float32) (float32)
+    Func func(args []float32) (float32)
 }
 
 func save_result(score int, config Config) (){
@@ -48,37 +47,47 @@ func save_result(score int, config Config) (){
     }
 }
 
-func get_random_values(level string) (float32, float32){
-    seed := rand.NewSource(time.Now().UnixNano())
-    randgen := rand.New(seed)
-    var r1, r2 float32
+func get_random(rand_range [3]float32) (float32) {
+    step := rand_range[2]
+    min := int(rand_range[0]/step)
+    max := int(rand_range[1]/step)
+    return step*float32(rand.Intn(max)+min)
+}
+
+func get_random_values(level string) ([]float32){
+    var r []float32
+    var rang_range [3]float32
+    var n int
     switch level {
     case "Easy":
-        r1 = float32(randgen.Intn(20))/2
-        r2 = float32(randgen.Intn(20))/2
+        n = 2
+        rang_range = [3]float32{0, 20, 1}
     case "Normal":
-        r1 = float32(randgen.Intn(100)-50)/2
-        r2 = float32(randgen.Intn(100)-50)/2
+        n = 2
+        rang_range = [3]float32{-20, 20, 0.5}
     case "Hard":
-        r1 = float32(randgen.Intn(200)-100)/8
-        r2 = float32(randgen.Intn(200)-100)/8
+        n = 2
+        rang_range = [3]float32{-50, 50, 0.5}
     default:
         panic("DEFINE YOURSELF!")
     }
-    return r1, r2
+
+    for len(r) < n {
+        r = append(r, get_random(rang_range))
+    }
+
+    return r
 }
 
 func get_function() (operation) {
-    seed := rand.NewSource(time.Now().UnixNano())
-    randgen := rand.New(seed)
 
     flist := []operation {
                  operation{"+", add},
-		             operation{"-", substract},
-		             operation{"*", multiply},
-		             operation{"/", divide}}
+                 operation{"-", substract},
+                 operation{"*", multiply},
+                 operation{"/", divide}}
 
-    f_index := randgen.Intn(len(flist))
+    f_index := rand.Intn(len(flist))
     return flist[f_index]
 }
 
@@ -99,10 +108,8 @@ func divide(args []float32) (float32) {
 }
 
 func zeroDivide(r2 float32) (float32) {
-    seed := rand.NewSource(time.Now().UnixNano())
-    randgen := rand.New(seed)
     for r2 == 0 {
-        r2 = float32(randgen.Intn(200)-100)/8
+        r2 = float32(rand.Intn(200)-100)/8
     }
     return r2
 }
@@ -120,10 +127,12 @@ func main() {
     fmt.Printf("Hello, %s. Let's do this!\n", config.User)
     fmt.Printf("Selected difficulty: %s\n", config.Level)
 
-    var r1, r2 float32
-    var op operation
+    // Random generator initition
+    rand.Seed(time.Now().UnixNano())
 
     // Variables
+    var r []float32
+    var op operation
     var answer, expected float32
     score := 0
     good_responses := []string{"Awesome.", "Obviously.", "Yep.",
@@ -133,15 +142,14 @@ func main() {
     for i:=0; i<config.Num; i++ {
         fmt.Printf("%d. ", i)
 
-        // TODO: Why only two variables?
-        r1, r2 = get_random_values(config.Level)
+        r = get_random_values(config.Level)
 
         // TODO: Making more sensible operations
         // e.g. rounding when using "/"
         op = get_function()
-        expected = op.fname([]float32{r1, r2})
+        expected = op.Func(r)
 
-        fmt.Printf("%g %s %g = ", r1, op.name, r2)
+        fmt.Printf("%g %s %g = ", r[0], op.name, r[1])
         _, err := fmt.Scanf("%g", &answer)
         if err != nil {
             fmt.Println("Cannot read answer:", err)
