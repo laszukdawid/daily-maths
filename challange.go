@@ -125,7 +125,7 @@ func add(args []float32) (float32) {
     return args[0] + args[1]
 }
 
-func substract(args []float32) (float32) {
+func subtract(args []float32) (float32) {
     return args[0] - args[1]
 }
 
@@ -148,7 +148,7 @@ func initialize(config Config) () {
 
     // Define operations depending on level
     posOps = append(posOps,  operation{"+", add, 2})
-    posOps = append(posOps,  operation{"-", substract, 2})
+    posOps = append(posOps,  operation{"-", subtract, 2})
 
     if config.Level != "Easy" {
         posOps = append(posOps, operation{"*", multiply, 2})
