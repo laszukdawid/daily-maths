@@ -2,5 +2,5 @@ language: go
 go:
   - 1.x
 script:
-  - go make
+  - go build
   - go test
