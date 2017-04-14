@@ -1,3 +1,6 @@
+[![codecov](https://codecov.io/gh/laszukdawid/daily-maths/branch/master/graph/badge.svg)](https://codecov.io/gh/laszukdawid/daily-maths)
+[![Build Status](https://travis-ci.org/laszukdawid/daily-maths.png?branch=master)](https://travis-ci.org/laszukdawid/daily-maths)
+
 # daily-maths
 Daily dose of simple maths. Stay sharp.
 
