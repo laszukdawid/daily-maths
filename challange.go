@@ -159,6 +159,7 @@ func initialize(config Config) () {
         panic("Level should be within range 0 -- 10.")
     }
 
+    posOps = nil
     switch {
         case (level > 7): // HARD
             posOps = append(posOps, operation{"/", divide, 2})
@@ -166,7 +167,7 @@ func initialize(config Config) () {
         case (level > 4): // MEDIUM
             posOps = append(posOps, operation{"*", multiply, 2})
             fallthrough
-        case (level > 2): // EASY
+        case (level > 1): // EASY
             posOps = append(posOps,  operation{"-", subtract, 2})
     }
     posOps = append(posOps,  operation{"+", add, 2})
