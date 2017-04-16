@@ -14,7 +14,7 @@ var posOps []operation
 
 type Config struct {
     User    string
-    Level   string
+    Level   int
     Num     int
 }
 
@@ -28,6 +28,8 @@ type exercise struct {
     op operation
     args []float32
 }
+
+
 ////////////////////////////////////////
 func saveResult(score int, config Config) (){
     path := "./results/"+config.User
@@ -50,8 +52,8 @@ func saveResult(score int, config Config) (){
     defer f.Close()
 
     dataStr := time.Now().Format("2006-01-02 15:04:05")
-    level := config.Level[0:1]
-    text := fmt.Sprintf("%s %d %s\n", dataStr, score, level)
+    level := config.Level
+    text := fmt.Sprintf("%s %d %d\n", dataStr, score, level)
 
     if _, err := f.WriteString(text); err != nil {
         panic(err)
@@ -75,18 +77,18 @@ func getRandom(randRange [3]float32) (float32) {
     return step*float32(rand.Intn(max)+min)
 }
 
-func getRandomValues(level string, n int) ([]float32){
+func getRandomValues(level int, n int) ([]float32){
     var r []float32
     var randRange [3]float32
-    switch level {
-    case "Easy":
-        randRange = [3]float32{0, 20, 1}
-    case "Normal":
+    switch {
+    case (10 >= level && level >= 7):
+        randRange = [3]float32{-30, 30, 0.5}
+    case (level >= 4):
         randRange = [3]float32{-20, 20, 0.5}
-    case "Hard":
-        randRange = [3]float32{-50, 50, 0.5}
+    case (level >= 0):
+        randRange = [3]float32{0, 20, 1}
     default:
-        panic("DEFINE YOURSELF!")
+        panic("Level value should be within range 0--10")
     }
 
     for len(r) < n {
@@ -101,7 +103,7 @@ func getFunction() (operation) {
     return posOps[f_index]
 }
 
-func getExercise(level string) (exercise) {
+func getExercise(level int) (exercise) {
     var ex exercise
 
     // TODO: Make harder exercise could have more than one eq
@@ -110,7 +112,6 @@ func getExercise(level string) (exercise) {
 
     // Divide by zero
     for op.name == "/" && args[1] == 0 {
-        fmt.Println("Repeat")
         args = getRandomValues(level, op.argsNum)
     }
 
@@ -141,19 +142,34 @@ func divide(args []float32) (float32) {
 func initialize(config Config) () {
     // Greetings are important
     fmt.Printf("Hello, %s. Let's do this!\n", config.User)
-    fmt.Printf("Selected difficulty: %s\n", config.Level)
+    fmt.Printf("Selected difficulty: %d\n", config.Level)
 
-    // Random generator initition
+    // Random generator initiation
     rand.Seed(time.Now().UnixNano())
 
-    // Define operations depending on level
-    posOps = append(posOps,  operation{"+", add, 2})
-    posOps = append(posOps,  operation{"-", subtract, 2})
-
-    if config.Level != "Easy" {
-        posOps = append(posOps, operation{"*", multiply, 2})
-        posOps = append(posOps, operation{"/", divide, 2})
+    // Check selected number of iterations
+    num := config.Num
+    if (num < 0) {
+        panic("Negative number of iterations. Something's fishy.")
     }
+
+    // Define operations depending on level
+    level := config.Level
+    if (level < 0 || level > 10) {
+        panic("Level should be within range 0 -- 10.")
+    }
+
+    switch {
+        case (level > 7): // HARD
+            posOps = append(posOps, operation{"/", divide, 2})
+            fallthrough
+        case (level > 4): // MEDIUM
+            posOps = append(posOps, operation{"*", multiply, 2})
+            fallthrough
+        case (level > 2): // EASY
+            posOps = append(posOps,  operation{"-", subtract, 2})
+    }
+    posOps = append(posOps,  operation{"+", add, 2})
 }
 ////////////////////////////////////////
 // Magic starts here
@@ -178,7 +194,7 @@ func main() {
         "Whoever thinks otherwise is stupid."}
 
     for i:=0; i<config.Num; i++ {
-        fmt.Printf("%d. ", i)
+        fmt.Printf("%d. ", (i+1))
 
         // TODO: Making more sensible operations
         // e.g. rounding when using "/"
@@ -196,7 +212,7 @@ func main() {
             fmt.Println(goodResponses[responseIdx])
             score += 1
         } else {
-            fmt.Println("Nope. Excpected:", expected)
+            fmt.Println("Nope. Expected:", expected)
         }
     }
     fmt.Printf("Final score: %d/%d\n", score, config.Num)
