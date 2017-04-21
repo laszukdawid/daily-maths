@@ -2,6 +2,7 @@ package main
 
 import (
     "fmt"
+    "math"
     "testing"
 )
 ////////////////////
@@ -81,6 +82,24 @@ func TestIteration(t *testing.T) {
 
 }
 
+/////////// TEST RANDOM ///////////
+func TestRandomRange(t *testing.T) {
+    testRepeats := 40
+    testRange := [3]float32{0, 20, 0.25}
+
+    for i:=0; i<testRepeats; i++ {
+        val := getRandom(testRange)
+        if (val<testRange[0] || val>testRange[1]) {
+            panic("Out of range")
+        }
+        // Caution: Mod doesn't round. Step needs to be 2**z
+        if math.Mod(float64(val), float64(testRange[2])) != 0 {
+            panic("Wrong step")
+        }
+    }
+}
+
+/////////// TEST OPERATIONS ///////////
 func TestAdd(t *testing.T) {
     x, y := float32(3), float32(5)
     args := []float32{x, y}

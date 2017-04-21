@@ -65,7 +65,19 @@ func evaluateExercise(ex exercise) (float32) {
 }
 
 func displayExcercise(ex exercise) {
-    fmt.Printf("%g %s %g = ", ex.args[0], ex.op.name, ex.args[1])
+    opName := ex.op.name
+    args := ex.args
+
+    if opName=="-" && args[1]<0 {
+        opName = "+"
+        args[1] *= -1
+    }
+    if opName=="+" && args[1]<0 {
+        opName = "-"
+        args[1] *= -1
+    }
+
+    fmt.Printf("%g %s %g = ", args[0], opName, args[1])
 }
 
 ////////////////////////////////////////
