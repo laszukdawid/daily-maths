@@ -1,0 +1,9 @@
+# Init go at go. Go go go.
+# https://coverage.readthedocs.io/en/latest/config.html
+
+[report]
+exclude_lines =
+    func main() {
+
+[html]
+directory = coverage_html_report
