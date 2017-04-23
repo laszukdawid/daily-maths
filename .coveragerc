@@ -3,7 +3,7 @@
 
 [report]
 exclude_lines =
-    func main() {
+    func main()
 
 [html]
 directory = coverage_html_report
