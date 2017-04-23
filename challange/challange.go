@@ -1,7 +1,6 @@
-package main
+package challange
 
 import (
-    "encoding/json"
     "fmt"
     "math/rand"
     "os"
@@ -31,7 +30,7 @@ type exercise struct {
 
 
 ////////////////////////////////////////
-func saveResult(score int, config Config) (){
+func SaveResult(score int, config Config) (){
     path := "./results/"+config.User
     var f *os.File
     var err error
@@ -60,11 +59,11 @@ func saveResult(score int, config Config) (){
     }
 }
 
-func evaluateExercise(ex exercise) (float32) {
+func EvaluateExercise(ex exercise) (float32) {
     return ex.op.Func(ex.args)
 }
 
-func displayExcercise(ex exercise) {
+func DisplayExcercise(ex exercise) {
     opName := ex.op.name
     args := ex.args
 
@@ -82,14 +81,14 @@ func displayExcercise(ex exercise) {
 
 ////////////////////////////////////////
 // Random select
-func getRandom(randRange [3]float32) (float32) {
+func GetRandom(randRange [3]float32) (float32) {
     step := randRange[2]
     min := int(randRange[0]/step)
     max := int(randRange[1]/step)
     return step*float32(rand.Intn(max)+min)
 }
 
-func getRandomValues(level int, n int) ([]float32){
+func GetRandomValues(level int, n int) ([]float32){
     var r []float32
     var randRange [3]float32
     switch {
@@ -104,27 +103,27 @@ func getRandomValues(level int, n int) ([]float32){
     }
 
     for len(r) < n {
-        r = append(r, getRandom(randRange))
+        r = append(r, GetRandom(randRange))
     }
 
     return r
 }
 
-func getFunction() (operation) {
+func GetFunction() (operation) {
     f_index := rand.Intn(len(posOps))
     return posOps[f_index]
 }
 
-func getExercise(level int) (exercise) {
+func GetExercise(level int) (exercise) {
     var ex exercise
 
     // TODO: Make harder exercise could have more than one eq
-    op := getFunction()
-    args := getRandomValues(level, op.argsNum)
+    op := GetFunction()
+    args := GetRandomValues(level, op.argsNum)
 
     // Divide by zero
     for op.name == "/" && args[1] == 0 {
-        args = getRandomValues(level, op.argsNum)
+        args = GetRandomValues(level, op.argsNum)
     }
 
     ex.op = op
@@ -134,24 +133,24 @@ func getExercise(level int) (exercise) {
 }
 ////////////////////////////////////////
 // Maths operators/functions
-func add(args []float32) (float32) {
+func Add(args []float32) (float32) {
     return args[0] + args[1]
 }
 
-func subtract(args []float32) (float32) {
+func Subtract(args []float32) (float32) {
     return args[0] - args[1]
 }
 
-func multiply(args []float32) (float32) {
+func Multiply(args []float32) (float32) {
     return args[0] * args[1]
 }
 
-func divide(args []float32) (float32) {
+func Divide(args []float32) (float32) {
     return args[0] / args[1]
 }
 
 ////////////////////////////////////////
-func initialize(config Config) () {
+func Initialize(config Config) () {
     // Greetings are important
     fmt.Printf("Hello, %s. Let's do this!\n", config.User)
     fmt.Printf("Selected difficulty: %d\n", config.Level)
@@ -174,63 +173,15 @@ func initialize(config Config) () {
     posOps = nil
     switch {
         case (level > 7): // HARD
-            posOps = append(posOps, operation{"/", divide, 2})
+            posOps = append(posOps, operation{"/", Divide, 2})
             fallthrough
         case (level > 4): // MEDIUM
-            posOps = append(posOps, operation{"*", multiply, 2})
+            posOps = append(posOps, operation{"*", Multiply, 2})
             fallthrough
         case (level > 1): // EASY
-            posOps = append(posOps,  operation{"-", subtract, 2})
+            posOps = append(posOps,  operation{"-", Subtract, 2})
     }
-    posOps = append(posOps,  operation{"+", add, 2})
+    posOps = append(posOps,  operation{"+", Add, 2})
 }
 ////////////////////////////////////////
 // Magic starts here
-func main() {
-    file, _ := os.Open("config.json")
-    decoder := json.NewDecoder(file)
-    config := Config{}
-
-    err := decoder.Decode(&config)
-    if err != nil {
-        fmt.Println("Error while decoding config", err)
-    }
-
-    // Initialize
-    initialize(config)
-
-    // Variables
-    var answer, expected float32
-    score := 0
-    goodResponses := []string{"Awesome.", "Obviously.", "Yep.",
-        "10 points for "+config.User+"dor.",
-        "Whoever thinks otherwise is stupid."}
-
-    for i:=0; i<config.Num; i++ {
-        fmt.Printf("%d. ", (i+1))
-
-        // TODO: Making more sensible operations
-        // e.g. rounding when using "/"
-        ex := getExercise(config.Level)
-
-        expected = evaluateExercise(ex)
-        displayExcercise(ex)
-        _, err := fmt.Scanf("%g", &answer)
-        if err != nil {
-            fmt.Println("Cannot read answer:", err)
-        }
-
-        if answer==expected {
-            responseIdx := rand.Intn(len(goodResponses))
-            fmt.Println(goodResponses[responseIdx])
-            score += 1
-        } else {
-            fmt.Println("Nope. Expected:", expected)
-        }
-    }
-    fmt.Printf("Final score: %d/%d\n", score, config.Num)
-
-    // Saving
-    saveResult(score, config)
-
-}

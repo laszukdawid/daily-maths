@@ -1,4 +1,4 @@
-package main
+package challange
 
 import (
     "fmt"
@@ -40,22 +40,22 @@ func TestLevel(t *testing.T) {
     // Fail - level = -1
     config = Config{"User", -1, 5}
     msg = "Testing `Initialize` with level=-1"
-    assertPanic(t, func(){initialize(config)}, msg)
+    assertPanic(t, func(){Initialize(config)}, msg)
 
     // Fail - level = 11
     config = Config{"User", 11, 5}
     msg = "Testing `Initialize` with level=11"
-    assertPanic(t, func(){initialize(config)}, msg)
+    assertPanic(t, func(){Initialize(config)}, msg)
 
     // Success - level = 0
     config = Config{"User", 0, 5}
     msg = "Testing `Initialize` with level=0"
-    assertNotPanic(t, func(){initialize(config)}, msg)
+    assertNotPanic(t, func(){Initialize(config)}, msg)
 
     // Success - level = 10
     config = Config{"User", 10, 5}
     msg = "Testing `Initialize` with level=10"
-    assertNotPanic(t, func(){initialize(config)}, msg)
+    assertNotPanic(t, func(){Initialize(config)}, msg)
 }
 
 func TestIteration(t *testing.T) {
@@ -67,18 +67,18 @@ func TestIteration(t *testing.T) {
 
     // Fail - iter < 0
     config = Config{"User", 5, -1}
-    msg = "Testing `initialize` with iter=-1"
-    assertPanic(t, func(){initialize(config)}, msg)
+    msg = "Testing `Initialize` with iter=-1"
+    assertPanic(t, func(){Initialize(config)}, msg)
 
     // Fail - iter = 0
     config = Config{"User", 0, -1}
-    msg = "Testing `initialize` with iter=0"
-    assertPanic(t, func(){initialize(config)}, msg)
+    msg = "Testing `Initialize` with iter=0"
+    assertPanic(t, func(){Initialize(config)}, msg)
 
     // Success - iter = 1
     config = Config{"User", 1, 5}
-    msg = "Testing `initialize` with iter=1"
-    assertNotPanic(t, func(){initialize(config)}, msg)
+    msg = "Testing `Initialize` with iter=1"
+    assertNotPanic(t, func(){Initialize(config)}, msg)
 
 }
 
@@ -88,7 +88,7 @@ func TestRandomRange(t *testing.T) {
     testRange := [3]float32{0, 20, 0.25}
 
     for i:=0; i<testRepeats; i++ {
-        val := getRandom(testRange)
+        val := GetRandom(testRange)
         if (val<testRange[0] || val>testRange[1]) {
             panic("Out of range")
         }
@@ -103,7 +103,7 @@ func TestRandomRange(t *testing.T) {
 func TestAdd(t *testing.T) {
     x, y := float32(3), float32(5)
     args := []float32{x, y}
-    if float32(x+y) != add(args) {
+    if float32(x+y) != Add(args) {
         panic("Simple function is not working.")
     }
 }
@@ -111,7 +111,7 @@ func TestAdd(t *testing.T) {
 func TestSubtract(t *testing.T) {
     x, y := float32(3), float32(5)
     args := []float32{x, y}
-    if float32(x-y) != subtract(args) {
+    if float32(x-y) != Subtract(args) {
         panic("Simple function is not working.")
     }
 }
@@ -119,7 +119,7 @@ func TestSubtract(t *testing.T) {
 func TestMutiply(t *testing.T) {
     x, y := float32(3), float32(5)
     args := []float32{x, y}
-    if float32(x*y) != multiply(args) {
+    if float32(x*y) != Multiply(args) {
         panic("Simple function is not working.")
     }
 }
@@ -127,7 +127,7 @@ func TestMutiply(t *testing.T) {
 func TestDivide(t *testing.T) {
     x, y := float32(3), float32(5)
     args := []float32{x, y}
-    if float32(x/y) != divide(args) {
+    if float32(x/y) != Divide(args) {
         panic("Simple function is not working.")
     }
 }
@@ -139,15 +139,15 @@ func TestOperations(t *testing.T) {
     user := "User"
     iter := 5
 
-    initialize(Config{user, 0, iter})
+    Initialize(Config{user, 0, iter})
     assertEqual(t, len(posOps), 1, "Level 0 - only +")
 
-    initialize(Config{user, 2, iter})
+    Initialize(Config{user, 2, iter})
     assertEqual(t, len(posOps), 2, "Level 2 - +-")
 
-    initialize(Config{user, 5, iter})
+    Initialize(Config{user, 5, iter})
     assertEqual(t, len(posOps), 3, "Level 5 - +-*")
 
-    initialize(Config{user, 8, iter})
+    Initialize(Config{user, 8, iter})
     assertEqual(t, len(posOps), 4, "Level 8 - +-*/")
 }
